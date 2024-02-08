@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 const collections = require("../config/collections")
 const AWS = require('aws-sdk');
-const axios=require("axios")
+const axios = require("axios")
 
 const OTP = require('twilio')(otpConfig.accountSID, otpConfig.authToken)
 
@@ -34,40 +34,39 @@ module.exports = {
                 // let phonenumber = registerData.countryCode + registerData.mobileNumber
                 let phonenumber = registerData.mobileNumber
 
-let otp=await generateOTP()
+                let otp = await generateOTP()
 
-axios.get(`https://fast2sms.com/dev/bulkV2?authorization=9bvmsXet40fdDZgRSNMOIhTnaFPwl8cyELixQW7roUAj5p3CB2vCfQk34mgLjoSWDVUI0AtauOHicNM2&route=otp&variables_values=${otp}&flash=0&numbers=${phonenumber}`).then(async () => {
+                // axios.get(`https://fast2sms.com/dev/bulkV2?authorization=7u8BEjmpCeVDRyrOMwSXG1a6TcJFQdkYIPvxfKi92tW5Zs3oA0Fea94pIKGlVtdm86jqwrc7XSNkAOZD&route=otp&variables_values=${otp}&flash=0&numbers=${phonenumber}`).then(async () => {
 
-// OTP.messages
-//   .create({
-//     body: `Your Verification OTP is ${otp}`,
-//     to: phonenumber, // Text your number
-//     from: '+12565888608', // From a valid Twilio number
-//   })
-  
+                // OTP.messages
+                //     .create({
+                //         body: `Your Verification OTP is ${otp}`,
+                //         to: phonenumber, // Text your number
+                //         from: '+18647321362', // From a valid Twilio number
+                //     }).then((message, err) => {
+                //         console.log(message, "MMMMMMMMMMM")
+                //         console.log(err, "EEEEEEEEEEEEE")
+                //     });
 
-  
+                const password = await bcrypt.hash(registerData.password, 10)
+                const signUp = await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).insertOne({
+                    username: registerData.username,
+                    mobileNumber: registerData.mobileNumber,
+                    otp: otp,
+                    posts: 0,
+                    following: 0,
+                    followers: 0,
+                    password: password,
+                    active: false,
+                    mobileVerified: false,
+                    date: Date.now()
+                })
+                console.log('otp Sended successfully');
+                resolve({ status: "success", message: "new account OTP verification needed" })
 
-
-const password= await bcrypt.hash(registerData.password, 10)
-  const signUp = await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).insertOne({
-    username: registerData.username,
-    mobileNumber: registerData.mobileNumber,
-    otp:otp,
-    posts: 0,
-    following: 0,
-    followers: 0,
-    password: password,
-    active: false,
-    mobileVerified: false,
-    date: Date.now()
-})
-console.log('otp Sended successfully');
-                        resolve({ status: "success", message: "new account OTP verification needed" })
-
-  }).catch((err) => {
-    console.log("error happened ", err)
-})
+                //   }).catch((err) => {
+                //     console.log("error happened ", err)
+                // })
                 // OTP.verify
                 //     .services(otpConfig.serviceID)
                 //     .verifications
@@ -84,49 +83,48 @@ console.log('otp Sended successfully');
             }
         })
     },
-   
+
 
     verifyotp: (otpData) => {
 
-        console.log("otpData",otpData)
+        console.log("otpData", otpData)
         return new Promise(async (resolve, reject) => {
 
+            const user = await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOne({ mobileNumber: otpData.mobileNumber })
 
-            const user=await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOne( {mobileNumber:otpData.mobileNumber})
+            console.log("user", user);
 
-            console.log("user",user);
+            if (user) {
 
-            if(user){
+                if (user.otp == otpData.otp) {
 
-                if(user.otp==otpData.otp){
-
-                    await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOneAndUpdate({ _id: user._id }, { $set: { active: true , mobileVerified:true,otp:null } },{returnNewDocument:true}).then(async (response)=>{
+                    await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOneAndUpdate({ _id: user._id }, { $set: { active: true, mobileVerified: true, otp: null } }, { returnNewDocument: true }).then(async (response) => {
                         console.log("response", response)
 
-                        if(response.ok){
-                            let userDetails= await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOne( {_id:response.value._id})
-                            
+                        if (response.ok) {
+                            let userDetails = await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOne({ _id: response.value._id })
 
-                            console.log("userDetails",userDetails)
-                            const token =await jwt.sign({ userId: userDetails._id }, config.secretKey, { expiresIn: '60d' });
-                                    resolve({ status: "success", message: "Account created. Please login.", userDetails: userDetails, token: token })
-                        }else{
+
+                            console.log("userDetails", userDetails)
+                            const token = await jwt.sign({ userId: userDetails._id }, config.secretKey, { expiresIn: '60d' });
+                            resolve({ status: "success", message: "Account created. Please login.", userDetails: userDetails, token: token })
+                        } else {
 
                             resolve({ status: "fail", message: "Something went wrong , Please try again later" })
                         }
 
-                    }).catch((err)=>{
+                    }).catch((err) => {
                         resolve({ status: "fail", message: "Something went wrong , Please try again later" })
                     })
 
 
-                }else{
+                } else {
                     console.log("OTP error");
-                        resolve({ status: "fail", message: "Please enter the correct OTP" })
+                    resolve({ status: "fail", message: "Please enter the correct OTP" })
                 }
 
-            }else{
-                
+            } else {
+
                 resolve({ status: "fail", message: "Something went wrong , Please try again later" })
             }
 
@@ -206,19 +204,19 @@ console.log('otp Sended successfully');
             if (!userExist) {
                 resolve({ status: "fail", message: "There is no account found with this Mobile number" })
             } if (userExist) {
-                let otp=await generateOTP()
+                let otp = await generateOTP()
 
-                client.db(collections.DATABASE).collection(collections.USER_COLLECTION).updateOne({ _id: userExist._id }, { $set: { password_reset_otp: otp } },{ upsert: true })
-
-                
-
-axios.get(`https://fast2sms.com/dev/bulkV2?authorization=9bvmsXet40fdDZgRSNMOIhTnaFPwl8cyELixQW7roUAj5p3CB2vCfQk34mgLjoSWDVUI0AtauOHicNM2&route=otp&variables_values=${otp}&flash=0&numbers=${loginData?.mobileNumber}`).then(async () => {
+                client.db(collections.DATABASE).collection(collections.USER_COLLECTION).updateOne({ _id: userExist._id }, { $set: { password_reset_otp: otp } }, { upsert: true })
 
 
 
-resolve({ status: "success", message: "otp sent" })
+                axios.get(`https://fast2sms.com/dev/bulkV2?authorization=9bvmsXet40fdDZgRSNMOIhTnaFPwl8cyELixQW7roUAj5p3CB2vCfQk34mgLjoSWDVUI0AtauOHicNM2&route=otp&variables_values=${otp}&flash=0&numbers=${loginData?.mobileNumber}`).then(async () => {
 
-                
+
+
+                    resolve({ status: "success", message: "otp sent" })
+
+
                 }).catch((err) => {
                     resolve({ status: "fail", message: "Something went wrong please try again later" })
                 })
@@ -227,43 +225,43 @@ resolve({ status: "success", message: "otp sent" })
     },
     resetPassword: (otpData) => {
 
-        console.log("otpData",otpData)
+        console.log("otpData", otpData)
         return new Promise(async (resolve, reject) => {
 
 
-            const user=await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOne( {mobileNumber:otpData.mobileNumber})
+            const user = await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOne({ mobileNumber: otpData.mobileNumber })
 
-            console.log("user",user);
+            console.log("user", user);
 
-            if(user){
+            if (user) {
 
-                if(user.password_reset_otp==otpData.otp){
+                if (user.password_reset_otp == otpData.otp) {
 
-                    const password= await bcrypt.hash(otpData.password, 10)
+                    const password = await bcrypt.hash(otpData.password, 10)
 
-                    await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOneAndUpdate({ _id: user._id }, { $set: { password:password,password_reset_otp:null } },{returnNewDocument:true}).then(async (response)=>{
+                    await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOneAndUpdate({ _id: user._id }, { $set: { password: password, password_reset_otp: null } }, { returnNewDocument: true }).then(async (response) => {
                         console.log("response", response)
 
-                        if(response.ok){
-                            
-                                    resolve({ status: "success", message: "Password Reset Successfully" })
-                        }else{
+                        if (response.ok) {
+
+                            resolve({ status: "success", message: "Password Reset Successfully" })
+                        } else {
 
                             resolve({ status: "fail", message: "Something went wrong , Please try again later" })
                         }
 
-                    }).catch((err)=>{
+                    }).catch((err) => {
                         resolve({ status: "fail", message: "Something went wrong , Please try again later" })
                     })
 
 
-                }else{
+                } else {
                     console.log("OTP error");
-                        resolve({ status: "fail", message: "Please enter the correct OTP" })
+                    resolve({ status: "fail", message: "Please enter the correct OTP" })
                 }
 
-            }else{
-                
+            } else {
+
                 resolve({ status: "fail", message: "Something went wrong , Please try again later" })
             }
 
@@ -340,7 +338,7 @@ resolve({ status: "success", message: "otp sent" })
                 if (online.userData) {
                     const obj = JSON.parse(online.userData);
                     const id = obj._id;
-                    await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).updateOne({ _id: new objectId(id) }, { $set: { onlineStatus: online.online } },{ upsert: true }).then((response) => {
+                    await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).updateOne({ _id: new objectId(id) }, { $set: { onlineStatus: online.online } }, { upsert: true }).then((response) => {
                         // console.log(response);
                     })
                 }

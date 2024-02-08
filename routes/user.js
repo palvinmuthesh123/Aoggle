@@ -105,10 +105,10 @@ router.get('/post/video-post/get-postsBySearch/:location', (req, res) => {
     })
 })
 
-router.get('/post/video-post/get-profile-posts',(req,res)=>{
-    console.log("router working")
-    console.log(req.query.userId);
-    postHelper.getProfilePosts(req.query.userId).then((response)=>{
+router.get('/post/video-post/get-profile-posts/:userId',(req,res)=>{
+    console.log(req.params,"CCCCCCCCCCCCCCCCCCc");
+    console.log(req.params.userId);
+    postHelper.getProfilePosts(req.params.userId).then((response)=>{
         res.json(response)
     })
 })
