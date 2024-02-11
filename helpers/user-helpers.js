@@ -89,11 +89,8 @@ module.exports = {
 
         console.log("otpData", otpData)
         return new Promise(async (resolve, reject) => {
-
             const user = await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOne({ mobileNumber: otpData.mobileNumber })
-
             console.log("user", user);
-
             if (user) {
 
                 if (user.otp == otpData.otp) {
