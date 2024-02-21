@@ -4,6 +4,7 @@ const config = require('../config/config');
 const collections = require("../config/collections");
 const { response } = require('express');
 var ffmpeg = require('ffmpeg');
+const {admin} = require('../firebase-config')
 
 // const escapeStringRegexp = require('escape-string-regexp');
 

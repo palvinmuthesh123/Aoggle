@@ -33,6 +33,15 @@ router.post('/auth/login',(req,res)=>{
     })
 });
 
+// Notifications
+router.get('/auth/notifications/:id',(req,res)=>{
+    console.log(req.query, "PPPPPPPPPPPPPPPPPPPPPP");
+    console.log("Notification Received")
+    userHelper.getNotifications(req.params.id).then((response)=>{
+        res.json(response);
+    })
+});
+
 // Create Post
 router.post('/auth/createPost',(req,res)=>{
     console.log("createPost route working")

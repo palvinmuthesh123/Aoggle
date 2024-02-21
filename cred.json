@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "aogglehomes-bcc0e",
+  "private_key_id": "4d5d71d3bdb85d778eb73ad270242d8c84b33d81",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCeMdYy/odpFPIV\nPp2KchHcmIsP77AM4+DaWOIyJSBmFP1VBkz8PIjU2YlWUP+EXvo2OmTFKIinko7/\nKsXTb75EwxhnX7S3/JEmiwq0GEA4Dq7eBVEHuxWFPKW4OHmVD3dEGRiAwL2rsDOv\ndqAw+12x62nD8Zo9zLAAwc1Ld+EdfwD3eC5klkTV6VcElYwvR2x8xeC0MkiT3kCr\nFmAPNuwx0dCGN7KCSeX0IpNz9kmzu2j2dZnXo/XyD1uOT+NzdRyZD+nPrBjpb3UC\nfcqmhdDS/P34UWTY2JdLKVUYrLgsDqVp/Q9jQFL6s3A56N38gYk74HlqXLQbm7gW\nkVzhdiQ/AgMBAAECggEAP1umdnYKtcN10ZxqbHCTRs6xo4hT8lWyUMEYlwzXlQsD\nC3KiksOL6fPWVYPLUrDXdbCde3logfTo4Lm40Z4HjnK063IhZy74038MomS0E7+N\nuc5XTclYLSzFEqtLxq+TDOsgLTEExiakDLpuHjAOrpuimJ/DLs00EJmOJ5OzzaPX\nALwEv9RaK4tcPKCJLXfAaxTk+oq5O9Jy2v/iPcpiU0SDrUNLhOPVy9UgHYPiyIHZ\nUBMy+D6Uc1tv/3IfFK+d96URG6k4ZIRsXB8IjfhG/8b6TqkNVK8G7nvPrPJpH9UV\nRia8WF2MHYAxNllDf9ZmpbAr6P5NSV81Z680n0lTQQKBgQDL66EOjjAhJ/KTnmsC\n1QCstoMGJu/xmLeuPE3YOFRvOlVvx78++mTldne5PYAJEXjAyQJ5FppWsxESC5LK\n/twsvXkKfA2eF0SDhTigqJqloVydEPTzGGImlcL31JHfrfavMXmxhwQOb1OojoST\ni/rV47L+nbjBLgIm82Ef6/F5owKBgQDGmKVedDuYo9hB9KvYaVN84SDBltvvJNuu\nUAPHS+CJUU3OqfXAdjBtBuKGE3e7Zv6F+9wesRr50G7YMLa2O87TirnR+i4Bl5oe\n0Qkx+sodnfHk8fCTKyiJO5N7EG6V1lt7TMKy1pliydSElQ1uUf/3V6Sbtu2LFH2R\nYeAkeVKMtQKBgH/T8x/mrfD606sJsVcTItshhbzDh8HQ08Oa9clGdldLH+d0NURL\nPhhBTQeHr8z/cMyYtL4nFxSmJ1tCegBaBrbdBxU1cmvZdg9j4X2Ec3zETAQBbys7\n67r4QkGMtOycZnin8PsCAd7ylmShAiZjpxeRJtFJGVmvd5XnFskl5Dc1AoGAPlbU\nMh4SRwvHaoy/FKObTWvtuFb+msbbHpCHXxv2U6Rt5B19wvhWoyKyIJwjzXO7GZvB\nsPCvIxPGd55y/Ckx9z1orvz1TBKmkl3ToRi0MS/PKqq3dbrqcol89fhmfipXdRDX\nXQP4CgaI60VOff7HdoDQbwCw+CNqdyReE5Tx0LECgYAd+puO380lEnWtSinAsrcv\nVpQKS6Unx2QMHEC0SU2uWZtUiVUFCQjj7rCy+T5ya7AmqFbYIsH/YHfizneS+xsr\nporByIpIIhJoQEGZ0/qsl2E80gM9cbGdXo0VI3BUWio51J6O8ChEVoh0BoB/h2SM\n6ceU36vDsKCUv3jICTzlVQ==\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-7z3q1@aogglehomes-bcc0e.iam.gserviceaccount.com",
+  "client_id": "102349226482823647771",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-7z3q1%40aogglehomes-bcc0e.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -6,7 +6,8 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/config');
 const collections = require("../config/collections")
 const AWS = require('aws-sdk');
-const axios = require("axios")
+const axios = require("axios");
+const { ObjectId } = require('mongodb');
 
 const OTP = require('twilio')(otpConfig.accountSID, otpConfig.authToken)
 
@@ -36,7 +37,7 @@ module.exports = {
 
                 let otp = await generateOTP()
 
-                // axios.get(`https://fast2sms.com/dev/bulkV2?authorization=7u8BEjmpCeVDRyrOMwSXG1a6TcJFQdkYIPvxfKi92tW5Zs3oA0Fea94pIKGlVtdm86jqwrc7XSNkAOZD&route=otp&variables_values=${otp}&flash=0&numbers=${phonenumber}`).then(async () => {
+                axios.get(`https://fast2sms.com/dev/bulkV2?authorization=695MzQAfg0K2WdxoSHBcFpjNVeG4DtCZy1nEi8JUamXLurlIbYfCcJalGXTWxMP15L0zIrtVQD46K7O3&route=otp&variables_values=${otp}&flash=0&numbers=${phonenumber}`).then(async () => {
 
                 // OTP.messages
                 //     .create({
@@ -59,14 +60,15 @@ module.exports = {
                     password: password,
                     active: false,
                     mobileVerified: false,
+                    token: registerData.tokens,
                     date: Date.now()
                 })
                 console.log('otp Sended successfully');
                 resolve({ status: "success", message: "new account OTP verification needed" })
 
-                //   }).catch((err) => {
-                //     console.log("error happened ", err)
-                // })
+                  }).catch((err) => {
+                    console.log("error happened ", err)
+                })
                 // OTP.verify
                 //     .services(otpConfig.serviceID)
                 //     .verifications
@@ -100,8 +102,6 @@ module.exports = {
 
                         if (response.ok) {
                             let userDetails = await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOne({ _id: response.value._id })
-
-
                             console.log("userDetails", userDetails)
                             const token = await jwt.sign({ userId: userDetails._id }, config.secretKey, { expiresIn: '60d' });
                             resolve({ status: "success", message: "Account created. Please login.", userDetails: userDetails, token: token })
@@ -181,8 +181,9 @@ module.exports = {
             if (!userExist) {
                 resolve({ status: "fail", message: "There is no account found with this Mobile number" })
             } if (userExist) {
-                bcrypt.compare(loginData.password, userExist.password).then((status) => {
+                bcrypt.compare(loginData.password, userExist.password).then(async (status) => {
                     if (status) {
+                        await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOneAndUpdate({ _id: userExist._id }, { $set: { token: loginData.tokens } }, { returnNewDocument: true })
                         console.log("login success in node server")
                         const token = jwt.sign({ userId: userExist._id }, config.secretKey, { expiresIn: '1h' });
                         resolve({ status: "success", message: "Login successfull", token: token, user: userExist })
@@ -195,6 +196,25 @@ module.exports = {
             }
         })
     },
+
+    getNotifications: (id) => {
+
+        return new Promise(async (resolve, reject) => {
+            
+            const notific = await client.db(collections.DATABASE).collection(collections.NOTIFICATION_COLLECTION).find({ uid: new ObjectId(id) }).toArray()
+            // const noti = await Deals.find()
+            console.log(notific, "IIIIIIIIIIIIIIIIIIIIII")
+            if (!notific) {
+                resolve({ status: "fail", message: "No Notifications received" })
+            } if (notific) {
+                resolve({ status: "success", message: "Received Notifications !!!", notification: notific })
+            }
+        }).catch((err) => {
+            resolve({ status: "fail", message: "Something went wrong please try again later" })
+        })
+
+    },
+
     requestOTP: (loginData) => {
         return new Promise(async (resolve, reject) => {
             const userExist = await client.db(collections.DATABASE).collection(collections.USER_COLLECTION).findOne({ mobileNumber: loginData.mobileNumber })
@@ -202,24 +222,16 @@ module.exports = {
                 resolve({ status: "fail", message: "There is no account found with this Mobile number" })
             } if (userExist) {
                 let otp = await generateOTP()
-
                 client.db(collections.DATABASE).collection(collections.USER_COLLECTION).updateOne({ _id: userExist._id }, { $set: { password_reset_otp: otp } }, { upsert: true })
-
-
-
                 axios.get(`https://fast2sms.com/dev/bulkV2?authorization=9bvmsXet40fdDZgRSNMOIhTnaFPwl8cyELixQW7roUAj5p3CB2vCfQk34mgLjoSWDVUI0AtauOHicNM2&route=otp&variables_values=${otp}&flash=0&numbers=${loginData?.mobileNumber}`).then(async () => {
-
-
-
                     resolve({ status: "success", message: "otp sent" })
-
-
                 }).catch((err) => {
                     resolve({ status: "fail", message: "Something went wrong please try again later" })
                 })
             }
         })
     },
+
     resetPassword: (otpData) => {
 
         console.log("otpData", otpData)
@@ -342,7 +354,7 @@ module.exports = {
 
                 resolve(online)
             } catch (error) {
-                rreject(error)
+                reject(error)
                 console.log(error)
             }
         })
